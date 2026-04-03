@@ -71,6 +71,14 @@ NSString *__iCloudsDriveDocumentsPath = nil;
 
     NSFileManager *fm = [NSFileManager defaultManager];
     NSString *path = [fm containerURLForSecurityApplicationGroupIdentifier:groupID].path;
+
+    // Fall back to the app's own documents directory when the App Group
+    // container is unavailable (e.g. developer builds without a registered
+    // App Group in the provisioning profile).
+    if (path == nil) {
+      path = [self documentsPath];
+    }
+
     __groupContainerPath = path;
   }
   return __groupContainerPath;

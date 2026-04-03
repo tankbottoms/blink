@@ -68,6 +68,7 @@ class PurchasesUserModel: ObservableObject {
   static let shared = PurchasesUserModel()
 
   private func refreshProducts() {
+    guard !XCConfig.infoPlistRevCatPubliKey().isEmpty else { return }
     if self.blinkShellPlusProduct == nil
         || self.classicProduct == nil
         || self.buildBasicProduct == nil
@@ -138,7 +139,10 @@ class PurchasesUserModel: ObservableObject {
     blinkPlusIntroOffer?.status == IntroEligibilityStatus.eligible
   }
 
-  func getUserID() -> String { Purchases.shared.appUserID }
+  func getUserID() -> String {
+    guard !XCConfig.infoPlistRevCatPubliKey().isEmpty else { return "" }
+    return Purchases.shared.appUserID
+  }
 
   private func _purchase(_ product: StoreProduct) async -> Bool {
     do {
@@ -503,10 +507,11 @@ extension StoreProduct {
 @objc public class PurchasesUserModelObjc: NSObject {
 
   @objc public static func preparePurchasesUserModel() {
-    if let key = XCConfig.infoPlistRevCatPubliKey(), !key.isEmpty {
+    let key = XCConfig.infoPlistRevCatPubliKey()
+    if !key.isEmpty {
       configureRevCat()
+      EntitlementsManager.shared.startUpdates()
     }
-    EntitlementsManager.shared.startUpdates()
     _ = PurchasesUserModel.shared
   }
 }
