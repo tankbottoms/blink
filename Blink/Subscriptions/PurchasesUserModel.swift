@@ -503,7 +503,9 @@ extension StoreProduct {
 @objc public class PurchasesUserModelObjc: NSObject {
 
   @objc public static func preparePurchasesUserModel() {
-    configureRevCat()
+    if let key = XCConfig.infoPlistRevCatPubliKey(), !key.isEmpty {
+      configureRevCat()
+    }
     EntitlementsManager.shared.startUpdates()
     _ = PurchasesUserModel.shared
   }
